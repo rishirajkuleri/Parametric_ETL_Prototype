@@ -1,4 +1,4 @@
-# Parametric ETL Prototype — NiFi + PySpark Medallion Architecture
+# Parametric ETL Prototype : NiFi + PySpark Medallion Architecture
 
 This project demonstrates an end-to-end **ETL pipeline** using **Apache NiFi** for orchestration and **PySpark** for data transformation — designed around the **Medallion Architecture (Bronze → Silver → Gold)**.  
 It was built as part of a data engineering learning project for **Parametric’s Data Management pipeline** simulation.
@@ -27,6 +27,7 @@ It replicates how modern data engineering teams process and refine datasets for 
 | **Orchestration** | NiFi | Automates the entire data flow using `ExecuteStreamCommand` & `PutFile` |
 
 ---
+
 
 ##  Project Structure
 Parametric_ETL_Prototype/
