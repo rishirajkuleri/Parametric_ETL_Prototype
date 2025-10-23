@@ -52,6 +52,7 @@ Parametric_ETL_Prototype/
 ## Concepts Demonstrated
 
 Medallion architecture (Bronze/Silver/Gold)
+
 ETL orchestration using NiFi
 PySpark transformations (schema casting, null handling)
 Aggregations with Spark SQL
