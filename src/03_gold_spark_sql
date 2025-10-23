@@ -1,0 +1,79 @@
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, sum as _sum, round as _round
+
+SILVER = r"C:\Parametric_ETL_Prototype\data\silver"
+GOLD   = r"C:\Parametric_ETL_Prototype\data\gold"
+
+spark = (
+    SparkSession.builder
+    .appName("GoldAnalytics")
+    .config("spark.sql.warehouse.dir", r"C:\Parametric_ETL_Prototype\data\warehouse")
+    .getOrCreate()
+)
+
+# Load Silver
+hold   = spark.read.parquet(rf"{SILVER}\holdings_clean.parquet")
+ref    = spark.read.parquet(rf"{SILVER}\reference_clean.parquet")
+prices = spark.read.parquet(rf"{SILVER}\prices_clean.parquet")
+
+# Register temp views for SQL-like clarity
+hold.createOrReplaceTempView("holdings")
+ref.createOrReplaceTempView("ref")
+prices.createOrReplaceTempView("prices")
+
+# 1) Latest price per ticker
+latest_prices = spark.sql("""
+    WITH ranked AS (
+        SELECT
+            ticker,
+            date,
+            close,
+            ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY date DESC) AS rn
+        FROM prices
+    )
+    SELECT ticker, close
+    FROM ranked
+    WHERE rn = 1
+""")
+latest_prices.createOrReplaceTempView("latest_prices")
+
+# 2) Position-level valuation
+positions = spark.sql("""
+    SELECT
+        h.client_id,
+        h.ticker,
+        COALESCE(p.close, 0.0)                                         AS last_close,
+        COALESCE(h.quantity, 0.0)                                      AS qty,
+        COALESCE(h.cost_basis, 0.0)                                    AS cost_basis,
+        COALESCE(h.quantity, 0.0) * COALESCE(p.close, 0.0)             AS market_value
+    FROM holdings h
+    LEFT JOIN latest_prices p ON h.ticker = p.ticker
+""")
+
+# 3) Join sector info
+positions = positions.join(ref.select("ticker","sector"), on="ticker", how="left")
+
+# 4) Aggregations for common reporting slices
+by_client = (positions
+    .groupBy("client_id")
+    .agg(
+        _round(_sum(col("market_value")), 2).alias("total_market_value"),
+        _round(_sum(col("cost_basis")), 2).alias("total_cost_basis")
+    ))
+
+by_client_sector = (positions
+    .groupBy("client_id", "sector")
+    .agg(_round(_sum(col("market_value")), 2).alias("mv_by_sector")))
+
+# Write Gold outputs (both parquet + CSV for easy viewing)
+positions.write.mode("overwrite").parquet(rf"{GOLD}\positions.parquet")
+by_client.write.mode("overwrite").parquet(rf"{GOLD}\by_client.parquet")
+by_client_sector.write.mode("overwrite").parquet(rf"{GOLD}\by_client_sector.parquet")
+
+# Friendly CSVs for quick inspection
+positions.coalesce(1).write.mode("overwrite").option("header", True).csv(rf"{GOLD}\positions_csv")
+by_client.coalesce(1).write.mode("overwrite").option("header", True).csv(rf"{GOLD}\by_client_csv")
+by_client_sector.coalesce(1).write.mode("overwrite").option("header", True).csv(rf"{GOLD}\by_client_sector_csv")
+
+spark.stop()
+print("Gold analytics complete -> data/gold/*")
