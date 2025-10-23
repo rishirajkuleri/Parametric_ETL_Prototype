@@ -41,15 +41,11 @@ Parametric_ETL_Prototype/
 │   │   ├── holdings_seed.csv
 │   │   ├── prices_seed.csv
 │   │   └── reference_tickers_seed.csv
-│   ├── silver/                    # PySpark output (ignored in git)
-│   └── gold/                      # Aggregated outputs (ignored in git)
 │
 ├── nifi/
 │   ├── nifi_flow_screenshot.png   # NiFi pipeline canvas
-│   └── flow_template.xml          # (optional) NiFi template export
 │
 ├── requirements.txt
-├── .gitignore
 └── README.md
 
 ## Concepts Demonstrated
