@@ -1,0 +1,53 @@
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, trim, when
+from pyspark.sql.types import DoubleType
+
+RAW = r"C:\Parametric_ETL_Prototype\data\raw"
+SILVER = r"C:\Parametric_ETL_Prototype\data\silver"
+
+spark = (
+    SparkSession.builder
+    .appName("SilverMastering")
+    .config("spark.sql.warehouse.dir", r"C:\Parametric_ETL_Prototype\data\warehouse")
+    .getOrCreate()
+)
+
+def trim_cols(df, cols):
+    for c in cols:
+        if c in df.columns:
+            df = df.withColumn(c, trim(col(c)))
+    return df
+
+# >>>>>>> Use explicit file names (they exist on your machine) <<<<<<<
+hold   = spark.read.option("header", True).csv(rf"{RAW}\holdings.csv")
+ref    = spark.read.option("header", True).csv(rf"{RAW}\reference_tickers.csv")
+prices = spark.read.option("header", True).csv(rf"{RAW}\prices.csv")
+
+# (optional fallback if you only had the _seed files)
+# hold   = spark.read.option("header", True).csv([rf"{RAW}\holdings.csv", rf"{RAW}\holdings_seed.csv"])
+# ref    = spark.read.option("header", True).csv([rf"{RAW}\reference_tickers.csv", rf"{RAW}\reference_tickers_seed.csv"])
+# prices = spark.read.option("header", True).csv([rf"{RAW}\prices.csv", rf"{RAW}\prices_seed.csv"])
+
+# Standardize
+hold   = trim_cols(hold,   ["client_id","ticker"])
+ref    = trim_cols(ref,    ["ticker","company","sector"])
+prices = trim_cols(prices, ["ticker","date"])
+
+hold = (hold
+        .withColumn("quantity",  col("quantity").cast(DoubleType()))
+        .withColumn("cost_basis",col("cost_basis").cast(DoubleType())))
+prices = prices.withColumn("close", col("close").cast(DoubleType()))
+
+# Validate/master
+valid_hold = hold.join(ref.select("ticker").dropDuplicates(), on="ticker", how="inner")
+valid_hold = valid_hold.withColumn("quantity", when(col("quantity") >= 0, col("quantity")).otherwise(0.0))
+valid_hold = valid_hold.withColumn("cost_basis", when(col("cost_basis") >= 0, col("cost_basis")).otherwise(None))
+valid_hold = valid_hold.dropDuplicates()
+
+# Write
+valid_hold.write.mode("overwrite").parquet(rf"{SILVER}\holdings_clean.parquet")
+ref.write.mode("overwrite").parquet(rf"{SILVER}\reference_clean.parquet")
+prices.write.mode("overwrite").parquet(rf"{SILVER}\prices_clean.parquet")
+
+spark.stop()
+print("Silver mastering complete -> data/silver/*.parquet")
