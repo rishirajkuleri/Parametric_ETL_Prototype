@@ -8,7 +8,7 @@ It was built as part of a data engineering learning project for **Parametric’s
 ## Architecture Overview
 
 <p align="center">
-  <img src="nifi/nifi_flow_screenshot.png" alt="NiFi Flow" width="850">
+  <img src="https://github.com/rishirajkuleri/Parametric_ETL_Prototype/blob/main/nifi/nifi_flow_screenshot.png.png" alt="NiFi Flow" width="850">
 </p>
 
 The pipeline automates ingestion, cleansing, transformation, and aggregation of financial data.  
