@@ -54,14 +54,23 @@ Parametric_ETL_Prototype/
 Medallion architecture (Bronze/Silver/Gold)
 
 ETL orchestration using NiFi
+
 PySpark transformations (schema casting, null handling)
+
 Aggregations with Spark SQL
+
 File-based data pipelines
+
 Data quality enforcement (valid vs invalid holdings)
+
 Reproducibility with virtual environments
 
 ## Future Improvement
+
 Integrate Delta Lake for versioned tables
+
 Add AWS S3 layer for cloud-based ingestion
+
 Include Airflow DAG orchestration alternative
+
 Automate NiFi template deployment using API
