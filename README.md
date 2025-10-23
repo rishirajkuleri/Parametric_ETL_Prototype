@@ -32,32 +32,21 @@ It replicates how modern data engineering teams process and refine datasets for 
 ##  Project Structure
 Parametric_ETL_Prototype/
 │
-
 ├── src/
-
-│ ├── 02_silver_spark.py # Cleans and transforms to Silver
-
-│ ├── 03_gold_sql.py # Aggregates to Gold
-
+│   ├── 02_silver_spark.py         # Cleans and transforms to Silver
+│   ├── 03_gold_sql.py             # Aggregates to Gold
 │
-
 ├── data/
-
-│ ├── raw/
-
-│ │ ├── holdings_seed.csv
-
-│ │ ├── prices_seed.csv
-
-│ │ └── reference_tickers_seed.csv
-
-│ ├── silver/ # PySpark output (ignored in git)
-
-│ └── gold/ # Aggregated outputs (ignored in git)
+│   ├── raw/
+│   │   ├── holdings_seed.csv
+│   │   ├── prices_seed.csv
+│   │   └── reference_tickers_seed.csv
+│   ├── silver/                    # PySpark output (ignored in git)
+│   └── gold/                      # Aggregated outputs (ignored in git)
 │
 ├── nifi/
-│ ├── nifi_flow_screenshot.png # NiFi pipeline canvas
-│ └── flow_template.xml # (optional) exportable NiFi template
+│   ├── nifi_flow_screenshot.png   # NiFi pipeline canvas
+│   └── flow_template.xml          # (optional) NiFi template export
 │
 ├── requirements.txt
 ├── .gitignore
