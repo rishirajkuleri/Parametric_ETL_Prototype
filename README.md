@@ -30,6 +30,7 @@ It replicates how modern data engineering teams process and refine datasets for 
 
 ##  Project Structure
 Parametric_ETL_Prototype/
+
 │
 ├── src/
 │ ├── 02_silver_spark.py # Cleans and transforms to Silver
@@ -48,28 +49,18 @@ Parametric_ETL_Prototype/
 ├── .gitignore
 └── README.md
 
-**Concepts Demonstrated**
+## Concepts Demonstrated
 
 Medallion architecture (Bronze/Silver/Gold)
-
 ETL orchestration using NiFi
-
 PySpark transformations (schema casting, null handling)
-
 Aggregations with Spark SQL
-
 File-based data pipelines
-
 Data quality enforcement (valid vs invalid holdings)
-
 Reproducibility with virtual environments
 
-**Future Improvements**
-
+## Future Improvement
 Integrate Delta Lake for versioned tables
-
 Add AWS S3 layer for cloud-based ingestion
-
 Include Airflow DAG orchestration alternative
-
 Automate NiFi template deployment using API
