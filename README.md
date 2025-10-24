@@ -28,8 +28,9 @@ It replicates how modern data engineering teams process and refine datasets for 
 
 ---
 
-```
+
 ##  Project Structure
+```
 Parametric_ETL_Prototype/
 │
 ├── src/
