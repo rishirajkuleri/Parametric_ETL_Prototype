@@ -28,7 +28,7 @@ It replicates how modern data engineering teams process and refine datasets for 
 
 ---
 
-
+```
 ##  Project Structure
 Parametric_ETL_Prototype/
 │
@@ -47,7 +47,7 @@ Parametric_ETL_Prototype/
 │
 ├── requirements.txt
 └── README.md
-
+```
 ## Concepts Demonstrated
 
 Medallion architecture (Bronze/Silver/Gold)
